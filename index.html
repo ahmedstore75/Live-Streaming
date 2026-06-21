@@ -38,7 +38,7 @@
 
     <main class="flex-1 flex flex-col lg:flex-row p-4 gap-4 max-w-[1800px] w-full mx-auto overflow-hidden h-[calc(100vh-70px)]">
         
-        <div class="w-full lg:flex-1 flex flex-col gap-4 h-full overflow-hidden">
+        <div class="w-full lg:flex-1 flex flex-col gap-4 h-full overflow-hidden justify-center">
             <div class="bg-[#0f172a] rounded-xl p-4 border border-[#1e293b] shadow-2xl flex flex-col justify-center">
                 <div class="flex items-center justify-between mb-3 px-1">
                     <div class="flex items-center space-x-2">
@@ -52,13 +52,6 @@
                     <video id="iptv-player" class="video-js vjs-default-skin vjs-big-play-centered w-full h-full" controls preload="auto" poster="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=1000">
                         <p class="vjs-no-js">To view this video please enable JavaScript</p>
                     </video>
-                </div>
-            </div>
-
-            <div class="bg-[#0f172a] p-4 rounded-xl border border-[#1e293b] shadow-lg shrink-0">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">Categories</h3>
-                <div id="category-container" class="flex gap-2 overflow-x-auto pb-2 snap-x scroll-smooth">
-                    <button class="snap-start shrink-0 px-4 py-2 rounded-lg text-xs font-semibold border bg-blue-600 text-white border-blue-500">Loading...</button>
                 </div>
             </div>
         </div>
@@ -88,22 +81,19 @@
         const m3uPlaylistUrl = "https://raw.githubusercontent.com/ahan443/FAST-IPTV/refs/heads/main/combined_playlist.m3u"; 
 
         let playlistData = [];
-        let currentCategory = "All";
         let player;
 
         document.addEventListener('DOMContentLoaded', () => {
             player = videojs('iptv-player', { fluid: true, controls: true, liveui: true });
             fetchM3UPlaylist();
-            setupOrientationFullscreen(); // রোটেট হ্যান্ডলার চালু করার জন্য
+            setupOrientationFullscreen(); 
         });
 
         // মোবাইল স্ক্রিন রোটেট হলে অটো ফুলস্ক্রিন করার ফাংশন
         function setupOrientationFullscreen() {
             const handleOrientationChange = () => {
-                // চেক করছে মোবাইল স্ক্রিন কি ল্যান্ডস্কেপ (বাকা) করা হয়েছে কিনা
                 const isLandscape = window.matchMedia("(orientation: landscape)").matches;
                 
-                // শুধুমাত্র ছোট স্ক্রিন বা মোবাইলের জন্য (৭৬৮ পিক্সেলের নিচে) এই নিয়ম খাটবে
                 if (window.innerWidth < 1024) { 
                     if (isLandscape) {
                         if (!player.isFullscreen()) {
@@ -117,9 +107,7 @@
                 }
             };
 
-            // স্ক্রিন সাইজ বা ওরিয়েন্টেশন চেঞ্জ হলে ইভেন্ট ট্রিগার হবে
             window.addEventListener("orientationchange", () => {
-                // অল্প একটু ডিলে দেওয়া হয়েছে যাতে ব্রাউজার সঠিক উইডথ হিসাব করতে পারে
                 setTimeout(handleOrientationChange, 200); 
             });
             
@@ -135,7 +123,6 @@
                 playlistData = parseM3U(m3uText);
                 
                 document.getElementById('channel-count').innerText = playlistData.length;
-                renderCategories();
                 renderChannels();
             } catch (error) {
                 console.error("Error loading M3U:", error);
@@ -157,9 +144,6 @@
                     const tvgLogoMatch = line.match(/tvg-logo="([^"]+)"/i);
                     currentChannel.logo = tvgLogoMatch ? tvgLogoMatch[1] : "";
 
-                    const groupTitleMatch = line.match(/group-title="([^"]+)"/i);
-                    currentChannel.category = groupTitleMatch ? groupTitleMatch[1] : "General";
-
                     const nameParts = line.split(',');
                     currentChannel.name = nameParts[nameParts.length - 1].trim() || "Unknown Channel";
                 } else if (line.startsWith('http') && currentChannel) {
@@ -171,44 +155,17 @@
             return channels;
         }
 
-        // Render Categories
-        function renderCategories() {
-            const categories = ["All", ...new Set(playlistData.map(item => item.category))];
-            const container = document.getElementById('category-container');
-            container.innerHTML = "";
-
-            categories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = `snap-start shrink-0 px-4 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                    currentCategory === cat 
-                    ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20' 
-                    : 'bg-[#131c31] text-gray-400 border-[#1e293b] hover:bg-[#1e293b] hover:text-white'
-                }`;
-                btn.innerText = cat;
-                btn.addEventListener('click', () => {
-                    currentCategory = cat;
-                    renderCategories();
-                    renderChannels();
-                });
-                container.appendChild(btn);
-            });
-        }
-
-        // Render Channels Grid
+        // Render Channels Grid (সব চ্যানেল একসাথে দেখাবে)
         function renderChannels() {
             const container = document.getElementById('channels-list');
             container.innerHTML = "";
 
-            const filteredChannels = playlistData.filter(channel => {
-                return (currentCategory === "All" || channel.category === currentCategory);
-            });
-
-            if(filteredChannels.length === 0) {
+            if(playlistData.length === 0) {
                 container.innerHTML = `<p class="col-span-full text-center text-gray-500 text-sm py-8">No channels found</p>`;
                 return;
             }
 
-            filteredChannels.forEach((channel, index) => {
+            playlistData.forEach((channel, index) => {
                 const card = document.createElement('div');
                 
                 let cardBg = "bg-[#131c31] border-[#1e293b]";
