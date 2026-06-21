@@ -17,7 +17,7 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
-        /* পোস্টার ইমেজটি যেন শুরুতে পুরো প্লেয়ার স্ক্রিন জুড়ে পারфেক্টলি ফিট থাকে */
+        /* পোস্টার ইমেজটি যেন শুরুতে পুরো প্লেয়ার স্ক্রিন জুড়ে পারফেক্টলি ফিট থাকে */
         .video-js .vjs-poster, 
         .video-js .vjs-poster img,
         .vjs-poster {
@@ -25,6 +25,13 @@
             object-fit: cover !important;
             width: 100% !important;
             height: 100% !important;
+        }
+
+        /* একটিভ বা সিলেক্টেড চ্যানেল কার্ডের জন্য কাস্টম স্টাইল */
+        .channel-card.active-channel {
+            border-color: #3b82f6 !important; /* উজ্জ্বল নীল বর্ডার */
+            background-color: #1e293b !important; /* কিছুটা হালকা ব্যাকগ্রাউন্ড */
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
         }
     </style>
 </head>
@@ -192,10 +199,11 @@
                     cardBg = "bg-[#111a2e] border-[#1c2a4a]"; 
                 }
 
-                card.className = `${cardBg} border rounded-xl p-3 flex flex-col items-center justify-between text-center cursor-pointer hover:border-blue-500/60 hover:bg-[#1b2b4d] transition-all group relative h-36 shrink-0`;
+                // এখানে 'channel-card' ক্লাসটি যুক্ত করা হয়েছে ট্র্যাকিং করার জন্য
+                card.className = `channel-card ${cardBg} border rounded-xl p-3 flex flex-col items-center justify-between text-center cursor-pointer hover:border-blue-500/60 hover:bg-[#1b2b4d] transition-all group relative h-36 shrink-0`;
                 
                 card.innerHTML = `
-                    <div class="absolute top-2 right-2 text-gray-600 group-hover:text-amber-400 transition-colors">
+                    <div class="star-icon absolute top-2 right-2 text-gray-600 group-hover:text-amber-400 transition-colors">
                         <i class="fa-regular fa-star text-[10px]"></i>
                     </div>
                     <div class="w-16 h-16 bg-[#0b111e] rounded-lg mb-2 flex items-center justify-center p-1.5 border border-[#1e293b] group-hover:scale-105 transition-transform overflow-hidden shadow-md">
@@ -204,26 +212,43 @@
                     <h4 class="text-[11px] font-semibold text-gray-300 group-hover:text-white line-clamp-2 w-full px-1 leading-tight">${channel.name}</h4>
                 `;
 
-                card.addEventListener('click', () => playChannel(channel));
+                // ক্লিক ইভেন্টে কার্ড এলিমেন্ট পাস করা হচ্ছে চিহ্ন ধরে রাখার জন্য
+                card.addEventListener('click', () => playChannel(channel, card));
                 container.appendChild(card);
             });
         }
 
-        // Play Channel Function (পোস্টার বাগ ফিক্স করা হয়েছে এখানে)
-        function playChannel(channel) {
+        // Play Channel Function
+        function playChannel(channel, selectedCardElement) {
             document.getElementById('current-channel-title').innerText = channel.name;
             
-            // ১. নতুন চ্যানেল প্লে করার আগে প্লেয়ারের পোস্টার লেয়ারটি সম্পূর্ণ খালি বা রিমুভ করে দেওয়া হচ্ছে
+            // ১. পূর্বে সিলেক্ট থাকা কার্ড থেকে চিহ্ন বা অ্যাক্টিভ ক্লাস রিমুভ করা
+            document.querySelectorAll('.channel-card').forEach(card => {
+                card.classList.remove('active-channel');
+                // স্টার আইকনকে সাধারণ অবস্থায় ফিরিয়ে আনা
+                const iconContainer = card.querySelector('.star-icon');
+                if (iconContainer) {
+                    iconContainer.innerHTML = '<i class="fa-regular fa-star text-[10px]"></i>';
+                    iconContainer.className = "star-icon absolute top-2 right-2 text-gray-600 group-hover:text-amber-400 transition-colors";
+                }
+            });
+
+            // ২. বর্তমান ক্লিক করা কার্ডে নতুন অ্যাক্টিভ চিহ্ন বা ক্লাস যুক্ত করা
+            if (selectedCardElement) {
+                selectedCardElement.classList.add('active-channel');
+                // ক্লিক করা চ্যানেলের স্টার আইকনটি সলিড এবং সোনালী কালার করা
+                const activeIcon = selectedCardElement.querySelector('.star-icon');
+                if (activeIcon) {
+                    activeIcon.innerHTML = '<i class="fa-solid fa-star text-[10px]"></i>';
+                    activeIcon.className = "star-icon absolute top-2 right-2 text-amber-400 transition-colors";
+                }
+            }
+
             player.poster(""); 
-            
-            // ২. নতুন স্ট্রিম সোর্স লোড করা হচ্ছে
             player.src({ src: channel.url, type: 'application/x-mpegURL' });
-            
-            // ৩. ভিডিও লোড এবং প্লে শুরু করার কমান্ড
             player.load();
             player.play().catch(err => {
                 console.log("Playback error or prevented:", err);
-                // যদি কোনো কারণে সোর্স ডেড থাকে বা লোড হতে দেরি হয়, তবে ইউজারকে ফিডব্যাক দেওয়া
                 document.getElementById('current-channel-title').innerText = channel.name + " (প্লে হতে সমস্যা হচ্ছে...)";
             });
         }
