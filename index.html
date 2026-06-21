@@ -17,15 +17,14 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
-        /* পোস্টার ইমেজটিকে প্লেয়ারের ভেতরে জোরপূর্বক ১০০% ফিট করার CSS */
+        /* পোস্টার ইমেজটি যেন শুরুতে পুরো প্লেয়ার স্ক্রিন জুড়ে পারфেক্টলি ফিট থাকে */
         .video-js .vjs-poster, 
         .video-js .vjs-poster img,
         .vjs-poster {
-            background-size: 100% 100% !important; /* উইডথ এবং হাইট ১০০% করার জন্য */
-            object-fit: cover !important; /* ইমেজ যাতে নষ্ট বা চ্যাপ্টা না হয় */
+            background-size: 100% 100% !important;
+            object-fit: cover !important;
             width: 100% !important;
             height: 100% !important;
-            display: block !important;
         }
     </style>
 </head>
@@ -90,8 +89,6 @@
 
     <script>
         const m3uPlaylistUrl = "https://raw.githubusercontent.com/ahan443/FAST-IPTV/refs/heads/main/combined_playlist.m3u"; 
-        
-        // এখানে আপনার কাঙ্খিত ১০০০ পিক্সেলের মুভি থিম পোস্টারটি অ্যাসাইন করা আছে
         const defaultPosterUrl = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=1000";
 
         let playlistData = [];
@@ -212,11 +209,23 @@
             });
         }
 
-        // Play Channel Function
+        // Play Channel Function (পোস্টার বাগ ফিক্স করা হয়েছে এখানে)
         function playChannel(channel) {
             document.getElementById('current-channel-title').innerText = channel.name;
+            
+            // ১. নতুন চ্যানেল প্লে করার আগে প্লেয়ারের পোস্টার লেয়ারটি সম্পূর্ণ খালি বা রিমুভ করে দেওয়া হচ্ছে
+            player.poster(""); 
+            
+            // ২. নতুন স্ট্রিম সোর্স লোড করা হচ্ছে
             player.src({ src: channel.url, type: 'application/x-mpegURL' });
-            player.play().catch(err => console.log("Playback error or prevented:", err));
+            
+            // ৩. ভিডিও লোড এবং প্লে শুরু করার কমান্ড
+            player.load();
+            player.play().catch(err => {
+                console.log("Playback error or prevented:", err);
+                // যদি কোনো কারণে সোর্স ডেড থাকে বা লোড হতে দেরি হয়, তবে ইউজারকে ফিডব্যাক দেওয়া
+                document.getElementById('current-channel-title').innerText = channel.name + " (প্লে হতে সমস্যা হচ্ছে...)";
+            });
         }
     </script>
 </body>
