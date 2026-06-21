@@ -17,11 +17,15 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
-        /* পোস্টারটি যাতে পুরো প্লেয়ার স্ক্রিন জুড়ে পারফেক্টলি কভার করে */
-        .video-js .vjs-poster {
-            background-size: cover !important;
-            background-position: center !important;
-            display: block !important; /* জোরপূর্বক দৃশ্যমান রাখার জন্য */
+        /* পোস্টার ইমেজটিকে প্লেয়ারের ভেতরে জোরপূর্বক ১০০% ফিট করার CSS */
+        .video-js .vjs-poster, 
+        .video-js .vjs-poster img,
+        .vjs-poster {
+            background-size: 100% 100% !important; /* উইডথ এবং হাইট ১০০% করার জন্য */
+            object-fit: cover !important; /* ইমেজ যাতে নষ্ট বা চ্যাপ্টা না হয় */
+            width: 100% !important;
+            height: 100% !important;
+            display: block !important;
         }
     </style>
 </head>
@@ -86,14 +90,14 @@
 
     <script>
         const m3uPlaylistUrl = "https://raw.githubusercontent.com/ahan443/FAST-IPTV/refs/heads/main/combined_playlist.m3u"; 
-        // কাজের সুবিধার জন্য পোস্টার ইমেজের ইউআরএল এখানে ভেরিয়েবলে রাখা হলো
+        
+        // এখানে আপনার কাঙ্খিত ১০০০ পিক্সেলের মুভি থিম পোস্টারটি অ্যাসাইন করা আছে
         const defaultPosterUrl = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=1000";
 
         let playlistData = [];
         let player;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // জাভাস্ক্রিপ্ট কনফিগারেশনের মাধ্যমে পোস্টার সরাসরি যুক্ত করা হলো
             player = videojs('iptv-player', { 
                 fluid: true, 
                 controls: true, 
