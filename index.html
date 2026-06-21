@@ -57,19 +57,6 @@
         </div>
 
         <div class="w-full lg:w-[450px] bg-[#0f172a] rounded-xl border border-[#1e293b] flex flex-col h-[500px] lg:h-full shadow-2xl overflow-hidden shrink-0">
-            
-            <div class="p-4 border-b border-[#1e293b] bg-gradient-to-r from-[#131c31] to-[#1e293b] rounded-t-xl shrink-0">
-                <div class="flex items-center space-x-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    <i class="fa-solid fa-bullhorn animate-bounce"></i>
-                    <span>Notice Board</span>
-                </div>
-                <div class="bg-[#0b111e]/80 border border-amber-500/20 rounded-lg p-2.5 text-xs text-gray-300 overflow-hidden relative">
-                    <marquee behavior="scroll" direction="left" scrollamount="4" class="font-medium">
-                        স্বাগতম! আমাদের লাইভ আইপিটিভি প্লেলিস্টটি সফলভাবে আপডেট করা হয়েছে। বাফারিং মুক্ত স্ট্রিমিং উপভোগ করুন।
-                    </marquee>
-                </div>
-            </div>
-
             <div id="channels-list" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 content-start">
                 <p class="col-span-full text-center text-gray-500 text-sm py-8">M3U প্লেলিস্ট লোড হচ্ছে...</p>
             </div>
@@ -155,7 +142,7 @@
             return channels;
         }
 
-        // Render Channels Grid (সব চ্যানেল একসাথে দেখাবে)
+        // Render Channels Grid
         function renderChannels() {
             const container = document.getElementById('channels-list');
             container.innerHTML = "";
