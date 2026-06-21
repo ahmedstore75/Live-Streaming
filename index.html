@@ -16,6 +16,12 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        
+        /* পোস্টার ইমেজটি যেন পুরো প্লেয়ার জুড়ে পারফেক্টলি ফিট হয় */
+        .video-js .vjs-poster {
+            background-size: cover !important;
+            background-position: center !important;
+        }
     </style>
 </head>
 <body class="text-gray-200 min-h-screen flex flex-col lg:h-screen">
@@ -49,7 +55,7 @@
                 </div>
                 
                 <div class="relative w-full rounded-xl overflow-hidden bg-black border border-[#1e293b] shadow-inner aspect-video">
-                    <video id="iptv-player" class="video-js vjs-default-skin vjs-big-play-centered w-full h-full" controls preload="auto" poster="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=1000">
+                    <video id="iptv-player" class="video-js vjs-default-skin vjs-big-play-centered w-full h-full" controls preload="auto" poster="https://img.freepik.com/free-vector/live-streaming-neon-sign-vector_1051-4229.jpg">
                         <p class="vjs-no-js">To view this video please enable JavaScript</p>
                     </video>
                 </div>
