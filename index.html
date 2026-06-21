@@ -17,10 +17,11 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
-        /* পোস্টার ইমেজটি যেন পুরো প্লেয়ার জুড়ে পারফেক্টলি ফিট হয় */
+        /* পোস্টারটি যাতে পুরো প্লেয়ার স্ক্রিন জুড়ে পারফেক্টলি কভার করে */
         .video-js .vjs-poster {
             background-size: cover !important;
             background-position: center !important;
+            display: block !important; /* জোরপূর্বক দৃশ্যমান রাখার জন্য */
         }
     </style>
 </head>
@@ -55,7 +56,7 @@
                 </div>
                 
                 <div class="relative w-full rounded-xl overflow-hidden bg-black border border-[#1e293b] shadow-inner aspect-video">
-                    <video id="iptv-player" class="video-js vjs-default-skin vjs-big-play-centered w-full h-full" controls preload="auto" poster="https://img.freepik.com/free-vector/live-streaming-neon-sign-vector_1051-4229.jpg">
+                    <video id="iptv-player" class="video-js vjs-default-skin vjs-big-play-centered w-full h-full" controls preload="auto">
                         <p class="vjs-no-js">To view this video please enable JavaScript</p>
                     </video>
                 </div>
@@ -85,12 +86,21 @@
 
     <script>
         const m3uPlaylistUrl = "https://raw.githubusercontent.com/ahan443/FAST-IPTV/refs/heads/main/combined_playlist.m3u"; 
+        // কাজের সুবিধার জন্য পোস্টার ইমেজের ইউআরএল এখানে ভেরিয়েবলে রাখা হলো
+        const defaultPosterUrl = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=1000";
 
         let playlistData = [];
         let player;
 
         document.addEventListener('DOMContentLoaded', () => {
-            player = videojs('iptv-player', { fluid: true, controls: true, liveui: true });
+            // জাভাস্ক্রিপ্ট কনফিগারেশনের মাধ্যমে পোস্টার সরাসরি যুক্ত করা হলো
+            player = videojs('iptv-player', { 
+                fluid: true, 
+                controls: true, 
+                liveui: true,
+                poster: defaultPosterUrl 
+            });
+            
             fetchM3UPlaylist();
             setupOrientationFullscreen(); 
         });
